@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import parse_rule,combine_rules_ast
+from .utils import parse_rule,combine_rules_ast,evaluate_rule_ast
 
 @api_view(['POST'])
 def create_rule(request):
@@ -54,11 +54,15 @@ def evaluate_rule_api(request):
     rule_string = request.data.get('rule_string')
     user_data = request.data.get('user_data')
 
-    if not rule_string or not user_data:
+    # Validate input
+    if not rule_string or not isinstance(user_data, dict):
         return Response({'Error': 'Invalid input'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Parse the rule string into an AST
     ast_node = parse_rule(rule_string)
-    evaluation_result = evaluate_rule(ast_node, user_data)
+
+    # Evaluate the rule against the user data
+    evaluation_result = evaluate_rule_ast(ast_node, user_data)
 
     return Response({
         'evaluation_result': evaluation_result

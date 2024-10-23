@@ -181,34 +181,140 @@ def combine_rules_ast(rules):
 
     return parse_rule(combined_rule)
 
-def evaluate_rule_api():
-    return ''
-# def evaluate_rule(node, user_data):
-#     if node is None:
-#         logging.warning("Received a None node")
-#         return False
 
-#     if isinstance(node, Identifier):
-#         return user_data.get(node.name)
 
-#     if isinstance(node, Literal):
-#         return node.value
 
-#     if isinstance(node, BinaryOperator):
-#         left_result = evaluate_rule(node.left, user_data)
-#         right_result = evaluate_rule(node.right, user_data)
 
-#         if node.operator == 'AND':
-#             return left_result and right_result
-#         elif node.operator == 'OR':
-#             return left_result or right_result
-#         elif node.operator in ('>', '<', '=='):
-#             if isinstance(left_result, (int, str)) and isinstance(right_result, (int, str)):
-#                 if node.operator == '>':
-#                     return left_result > right_result
-#                 elif node.operator == '<':
-#                     return left_result < right_result
-#                 elif node.operator == '==':
-#                     return left_result == right_result
 
-#     return False
+def evaluate_rule_ast(ast, user_data):
+    if ast is None:
+        raise TypeError("AST cannot be None")
+
+    operator = ast.get("operator")
+    left = ast.get("left")
+    right = ast.get("right")
+
+    # Function to retrieve value from user_data
+    def get_value(node):
+        if isinstance(node, dict):
+            if "name" in node:
+                return user_data.get(node["name"], None)
+            elif "value" in node:
+                return node["value"]
+        return None
+
+    # Retrieve left and right values
+    left_value = get_value(left)
+    right_value = get_value(right)
+
+    # Debugging output
+    print(f"Evaluating: {left_value} {operator} {right_value}")
+
+    # Handle None values for logical operators
+    if operator in ["AND", "OR"]:
+        left_result = evaluate_rule_ast(left, user_data) if left else False
+        right_result = evaluate_rule_ast(right, user_data) if right else False
+        if operator == "AND":
+            return left_result and right_result
+        elif operator == "OR":
+            return left_result or right_result
+    else:
+        # Handle comparisons
+        if left_value is None or right_value is None:
+            print(f"Warning: Cannot compare NoneType values: left_value={left_value}, right_value={right_value}")
+            return False  # or handle as needed
+
+        # Evaluate based on the operator
+        if operator == ">":
+            return left_value > right_value
+        elif operator == "<":
+            return left_value < right_value
+        elif operator == "==":
+            return left_value == right_value
+        elif operator == ">=":
+            return left_value >= right_value  # Add this line
+        elif operator == "<=":
+            return left_value <= right_value  # Add this line
+        else:
+            raise ValueError(f"Invalid operator: {operator}")
+
+    return False  # Fallback return value
+
+# Example user_data
+user_data = {
+    "age": 35,
+    "department": "Sales",
+    "salary": 60000,
+    "experience": 6
+}
+
+# Example AST
+ast = {
+    "operator": "AND",
+    "left": {
+        "operator": "OR",
+        "left": {
+            "operator": "AND",
+            "left": {
+                "operator": ">",
+                "left": {"name": "age"},
+                "right": {"value": 30}
+            },
+            "right": {
+                "operator": "==",
+                "left": {"name": "department"},
+                "right": {"value": "Sales"}
+            }
+        },
+        "right": {
+            "operator": "AND",
+            "left": {
+                "operator": "<",
+                "left": {"name": "age"},
+                "right": {"value": 25}
+            },
+            "right": {
+                "operator": "==",
+                "left": {"name": "department"},
+                "right": {"value": "Marketing"}
+            }
+        }
+    },
+    "right": {
+        "operator": "OR",
+        "left": {
+            "operator": ">",
+            "left": {"name": "salary"},
+            "right": {"value": 50000}
+        },
+        "right": {
+            "operator": ">",
+            "left": {"name": "experience"},
+            "right": {"value": 5}
+        }
+    }
+}
+
+# Run the evaluation
+result = evaluate_rule_ast(ast, user_data)
+print("Final Result:", result)  # Should print True based on the provided user_data
+result = evaluate_rule_ast(ast, user_data)
+print("Final Result:", result)  # Should print True based on the provided user_data
+# Example usage
+data = {"age": 35, "department": "Sales", "salary": 60000, "experience": 3}
+ast = {
+    "operator": "AND",
+    "left": {
+        "operator": ">",
+        "left": {"name": "age"},
+        "right": {"value": 30}
+    },
+    "right": {
+        "operator": ">",
+        "left": {"name": "salary"},
+        "right": {"value": 50000}
+    }
+}
+
+result = evaluate_rule_ast(ast, data)
+print(result)  # Output: True
