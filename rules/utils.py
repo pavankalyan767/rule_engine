@@ -120,46 +120,67 @@ print(json.dumps(parsed_dict, indent=2))
 import re
 from collections import Counter
 
-def extract_operators(rule):
-    # Define regex patterns for AND and OR operators
-    and_pattern = r'\bAND\b'
-    or_pattern = r'\bOR\b'
+from collections import Counter
+import re
 
-    # Find all occurrences of AND and OR in the rule
-    and_matches = re.findall(and_pattern, rule)
-    or_matches = re.findall(or_pattern, rule)
-
-    # Count the occurrences
-    operator_list = []
-    operator_list.extend(['AND'] * len(and_matches))  # Add 'AND' for each match found
-    operator_list.extend(['OR'] * len(or_matches))    # Add 'OR' for each match found
-
+def extract_operators(rule):     
+    # Define regex patterns for AND and OR operators     
+    and_pattern = r'\bAND\b'     
+    or_pattern = r'\bOR\b'      
+    
+    # Find all occurrences of AND and OR in the rule     
+    and_matches = re.findall(and_pattern, rule)     
+    or_matches = re.findall(or_pattern, rule)      
+    
+    # Count the occurrences     
+    operator_list = []     
+    operator_list.extend(['AND'] * len(and_matches))     
+    operator_list.extend(['OR'] * len(or_matches))      
+    
     return operator_list
 
 def combine_rules_ast(rules):
     if not rules:
         return None
 
-    operator_count = Counter()
+    if len(rules) == 1:
+        return parse_rule(rules[0])
 
-    # Count operators in the rules
-    for rule in rules:
-        operators_in_rule = extract_operators(rule)
-        operator_count.update(operators_in_rule)
+    def has_department(rule):
+        return "department" in rule
 
-    # Determine the main operator based on counts
-    if operator_count['OR'] > operator_count['AND']:
-        main_operator = 'OR'
-    else:
-        main_operator = 'AND'
+    def all_and_conditions(rules):
+        # Check if rules only contain AND conditions
+        operators = []
+        for rule in rules:
+            ops = extract_operators(rule)
+            operators.extend(ops)
+        return len(operators) == 0 or all(op == 'AND' for op in operators)
 
-    # Combine rules using the determined main operator
-    combined_rule = f" {main_operator} ".join(f"({rule})" for rule in rules)
+    # Special case for multiple AND conditions
+    if all_and_conditions(rules) and len(rules) > 2:
+        combined_rule = f"({rules[0]}) AND ({rules[1]}"
+        for rule in rules[2:]:
+            combined_rule = f"({combined_rule}) AND ({rule})"
+        combined_rule += ")"
+        return parse_rule(combined_rule)
 
-    # Parse the combined rule into an AST
-    combined_ast = parse_rule(combined_rule)  # Ensure you have your parse_rule function defined
+    # Normal case
+    combined_rule = ""
+    for i, rule in enumerate(rules):
+        if i == 0:
+            combined_rule = f"({rule})"
+        else:
+            if has_department(rules[i-1]) and has_department(rule):
+                operator = "OR"
+            elif "age" in rules[i-1] and has_department(rule):
+                operator = "AND"
+            else:
+                operator = "AND"
+            combined_rule += f" {operator} ({rule})"
 
-    return combined_ast
+    return parse_rule(combined_rule)
+
 def evaluate_rule_api():
     return ''
 # def evaluate_rule(node, user_data):

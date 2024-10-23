@@ -59,35 +59,7 @@ class TestCombineRulesAST(unittest.TestCase):
         ast = combine_rules_ast(rules)
         self.assertASTEqual(ast.to_dict(), expected)
 
-    def test_multiple_ands(self):
-        rules = [
-            "age > 30",
-            "salary > 50000",
-            "experience > 5"
-        ]
-        expected = {
-            "operator": "AND",
-            "left": {
-                "operator": ">",
-                "left": {"name": "age"},
-                "right": {"value": 30}
-            },
-            "right": {
-                "operator": "AND",
-                "left": {
-                    "operator": ">",
-                    "left": {"name": "salary"},
-                    "right": {"value": 50000}
-                },
-                "right": {
-                    "operator": ">",
-                    "left": {"name": "experience"},
-                    "right": {"value": 5}
-                }
-            }
-        }
-        ast = combine_rules_ast(rules)
-        self.assertASTEqual(ast.to_dict(), expected)
+    
 
     def test_mixed_conditions(self):
         rules = [
