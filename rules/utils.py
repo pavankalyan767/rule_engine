@@ -117,8 +117,49 @@ parsed_dict = ast.to_dict()
 print("\nParsed AST:")
 print(json.dumps(parsed_dict, indent=2))
 
-def combine_rule_ast():
-    return ''
+import re
+from collections import Counter
+
+def extract_operators(rule):
+    # Define regex patterns for AND and OR operators
+    and_pattern = r'\bAND\b'
+    or_pattern = r'\bOR\b'
+
+    # Find all occurrences of AND and OR in the rule
+    and_matches = re.findall(and_pattern, rule)
+    or_matches = re.findall(or_pattern, rule)
+
+    # Count the occurrences
+    operator_list = []
+    operator_list.extend(['AND'] * len(and_matches))  # Add 'AND' for each match found
+    operator_list.extend(['OR'] * len(or_matches))    # Add 'OR' for each match found
+
+    return operator_list
+
+def combine_rules_ast(rules):
+    if not rules:
+        return None
+
+    operator_count = Counter()
+
+    # Count operators in the rules
+    for rule in rules:
+        operators_in_rule = extract_operators(rule)
+        operator_count.update(operators_in_rule)
+
+    # Determine the main operator based on counts
+    if operator_count['OR'] > operator_count['AND']:
+        main_operator = 'OR'
+    else:
+        main_operator = 'AND'
+
+    # Combine rules using the determined main operator
+    combined_rule = f" {main_operator} ".join(f"({rule})" for rule in rules)
+
+    # Parse the combined rule into an AST
+    combined_ast = parse_rule(combined_rule)  # Ensure you have your parse_rule function defined
+
+    return combined_ast
 def evaluate_rule_api():
     return ''
 # def evaluate_rule(node, user_data):

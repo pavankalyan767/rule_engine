@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import parse_rule
+from .utils import parse_rule,combine_rules_ast
 
 @api_view(['POST'])
 def create_rule(request):
@@ -26,9 +26,27 @@ def create_rule(request):
 
 @api_view(['POST'])
 def combine_rules(request):
-    # Extracting rule_string directly from the request body
-    return ''
+    """
+    API endpoint to combine rules into a single AST.
+    Expects a JSON body with a list of rule strings.
+    """
+    rules = request.data.get('rules', [])
+    
+    if not isinstance(rules, list) or not all(isinstance(rule, str) for rule in rules):
+        return Response(
+            {'error': 'Invalid input. Please provide a list of rule strings.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
+    combined_ast = combine_rules_ast(rules)
+    
+    if combined_ast is None:
+        return Response(
+            {'error': 'No valid rules provided to combine.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    return Response({'combined_ast': combined_ast.to_dict()})
 
 
 @api_view(['POST'])
