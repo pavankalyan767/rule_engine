@@ -190,13 +190,24 @@ def evaluate_rule_ast(ast, user_data):
     if ast is None:
         raise TypeError("AST cannot be None")
 
-    operator = ast.get("operator")
-    left = ast.get("left")
-    right = ast.get("right")
+    # Check if the ast is a Node or a dict
+    if isinstance(ast, dict):
+        operator = ast.get("operator")
+        left = ast.get("left")
+        right = ast.get("right")
+    else:  # Assuming ast is a Node object
+        operator = ast.operator
+        left = ast.left
+        right = ast.right
 
     # Function to retrieve value from user_data
     def get_value(node):
-        if isinstance(node, dict):
+        if isinstance(node, Node):
+            if node.name:  # Assuming Node has a 'name' attribute
+                return user_data.get(node.name, None)
+            elif node.value:  # Assuming Node has a 'value' attribute
+                return node.value
+        elif isinstance(node, dict):
             if "name" in node:
                 return user_data.get(node["name"], None)
             elif "value" in node:
@@ -232,15 +243,14 @@ def evaluate_rule_ast(ast, user_data):
         elif operator == "==":
             return left_value == right_value
         elif operator == ">=":
-            return left_value >= right_value  # Add this line
+            return left_value >= right_value
         elif operator == "<=":
-            return left_value <= right_value  # Add this line
+            return left_value <= right_value
         else:
             raise ValueError(f"Invalid operator: {operator}")
 
     return False  # Fallback return value
 
-# Example user_data
 user_data = {
     "age": 35,
     "department": "Sales",
