@@ -136,3 +136,34 @@ When you combine rules, the response will be:
   "saved_combined_rule_id": 40,
   "saved_combined_rule_string": "COMBINED_RULE_STRING"
 }
+
+
+
+## Evaluate Rule API
+
+- **Endpoint**: `POST /evaluate-rule/`
+- **Description**: Evaluates a rule based on user data and the provided rule string, returning the evaluation result.
+
+### Request Format
+- **Content-Type**: `application/json`
+
+#### Example Request
+```json
+{
+    "user_data": {
+        "age": 22,
+        "income": 70000,
+        "department": "Engineering",
+        "spend": 500
+    },
+    "rule_string": "(department == 'Engineering' AND spend < 600) OR (age >= 20 AND income >= 50000)"
+}
+
+### Evaluate Rule Response
+
+#### Example Response
+```json
+{
+    "evaluation_result": true
+}
+
