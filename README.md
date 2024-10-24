@@ -22,15 +22,17 @@ cd rule_engine
 # Windows
 python -m venv venv
 venv\Scripts\activate
-
+```
+```bash
 # Linux/Mac
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 2. Install dependencies:
+## make sure you are inside rule_engine  directory use cd rule_engine to change to it  and then execute this command
 ```bash
-cd rule_engine
+
 pip install -r requirements.txt
 ```
 
@@ -49,12 +51,23 @@ python manage.py runserver
 
 ## Running Tests
 The project includes comprehensive test suites for all components.
+### Running Tests
 
+In order to run the tests, make sure your current working directory is:
+
+```bash
+your_username/rule_engine/
+```
 1. Run all tests:
 ```bash
 cd rule_engine
+```
+```bash
 cd rules
+```bash
 cd tests
+```
+```bash
 python run_tests.py
 ```
 
