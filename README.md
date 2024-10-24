@@ -74,8 +74,3 @@ When you create a rule, the response will be:
     "saved_rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
 }
 
-### Explanation
-- The above code block provides the JSON response after creating a rule, formatted for readability.
-- Ensure that you escape double quotes inside the JSON string (e.g., `\"IT\"`) so they display correctly.
-
-By using the triple backticks for code blocks and specifying `json` for syntax highlighting, your JSON should render neatly in the README file. Adjust the heading and explanations as needed to fit your overall documentation style!
