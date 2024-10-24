@@ -20,13 +20,45 @@ This document outlines the API endpoints for the Rule Engine application. Each e
         "operator": "OR",
         "left": {
             "operator": "AND",
-            "left": { "operator": ">", "left": { "name": "age" }, "right": { "value": 18 } },
-            "right": { "operator": ">=", "left": { "name": "income" }, "right": { "value": 50000 } }
+            "left": {
+                "operator": ">",
+                "left": {
+                    "name": "age"
+                },
+                "right": {
+                    "value": 18
+                }
+            },
+            "right": {
+                "operator": ">=",
+                "left": {
+                    "name": "income"
+                },
+                "right": {
+                    "value": 50000
+                }
+            }
         },
         "right": {
             "operator": "AND",
-            "left": { "operator": "==", "left": { "name": "department" }, "right": { "name": "IT" } },
-            "right": { "operator": "<", "left": { "name": "spend" }, "right": { "value": 1000 } }
+            "left": {
+                "operator": "==",
+                "left": {
+                    "name": "department"
+                },
+                "right": {
+                    "name": "IT"
+                }
+            },
+            "right": {
+                "operator": "<",
+                "left": {
+                    "name": "spend"
+                },
+                "right": {
+                    "value": 1000
+                }
+            }
         }
     },
     "saved_rule_id": 35,
