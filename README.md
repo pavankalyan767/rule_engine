@@ -74,3 +74,65 @@ When you create a rule, the response will be:
     "saved_rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
 }
 
+
+
+
+
+- **Endpoint**: `POST /combine-rules/`
+- **Description**: Accepts a list of ids of rule strings and gives a tree output of the combined rule strings.
+
+#### Request Format
+- **Content-Type**: `application/json`
+- **Example Request**:
+  ```json
+  {"rule_ids":[1,2,3]}
+
+
+### Combine Rule Response
+
+When you combine rules, the response will be:
+
+```json
+{
+  "combined_ast": {
+    "operator": "AND",
+    "left": {
+      "operator": "AND",
+      "left": {
+        "operator": ">",
+        "left": {
+          "name": "age"
+        },
+        "right": {
+          "value": 30
+        }
+      },
+      "right": {
+        "operator": "AND",
+        "left": {
+          "operator": ">",
+          "left": {
+            "name": "age"
+          },
+          "right": {
+            "value": 30
+          }
+        },
+        "right": {
+          "operator": "==",
+          "left": {
+            "name": "department"
+          },
+          "right": {
+            "value": "Sales"
+          }
+        }
+      }
+    },
+    "right": {
+      "name": "COMBINED_RULE_STRING"
+    }
+  },
+  "saved_combined_rule_id": 40,
+  "saved_combined_rule_string": "COMBINED_RULE_STRING"
+}
