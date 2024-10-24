@@ -1,7 +1,7 @@
 import unittest
 import json
 from typing import Dict, Any
-from utils import combine_rules_ast  # Assuming combine_rules_ast is in utils.py
+from ..utils import combine_rules_ast  # Assuming combine_rules_ast is in utils.py
 
 class TestCombineRulesAST(unittest.TestCase):
     def assertASTEqual(self, ast_dict: Dict[str, Any], expected_dict: Dict[str, Any]):

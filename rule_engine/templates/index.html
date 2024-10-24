@@ -46,6 +46,10 @@
             border-radius: 5px;
             margin-top: 10px;
         }
+        button:focus {
+    outline: 2px solid #0056b3; /* Provide a visible outline for accessibility */
+}
+
     </style>
 </head>
 <body>
@@ -99,7 +103,60 @@
     </div>
     
     
+    <div id="create-udf-container">
+        <h2>Create User Defined Function (UDF)</h2>
+    
+        <div>
+            <label for="udf-details">Enter UDF Details (JSON format):</label><br>
+            <textarea id="udf-details" placeholder='{"name": "UDF name", "definition": "UDF definition"}' rows="6" cols="50" required></textarea>
+        </div><br>
+    
+        <button onclick="createUDF()">Create UDF</button>
+    
+        <p id="udf-response-message"></p>
+    </div>
+    
+    
 
+    <div id="list-udfs-container" style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+        <h2 style="text-align: center;">List of User Defined Functions (UDFs)</h2>
+        <button onclick="listUDFs()" style="padding: 10px 15px; margin-bottom: 20px; cursor: pointer; background-color: #007BFF; color: white; border: none; border-radius: 5px;">
+            Fetch UDFs
+        </button>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">UDF Name</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Definition</th>
+                </tr>
+            </thead>
+            <tbody id="udf-list" style="font-size: 14px;">
+                <!-- UDFs will be appended here -->
+            </tbody>
+        </table>
+    </div>
+    
+    
+   
+    
+    <div id="update-udf-container">
+        <h2>Update User Defined Function (UDF)</h2>
+        
+        <div>
+            <label for="udf-name-input">UDF Name:</label>
+            <input type="text" id="udf-name-input" placeholder="Enter UDF Name" required>
+        </div>
+    
+        <div>
+            <label for="udf-definition-input">New Definition:</label>
+            <textarea id="udf-definition-input" rows="4" cols="50" placeholder="Enter new UDF definition" required></textarea>
+        </div>
+    
+        <button onclick="updateUDF()">Update UDF</button>
+        
+        <p id="update-response"></p>
+    </div>
+    
     
     
     
@@ -234,6 +291,105 @@ async function modifyRule() {
         responseDiv.textContent = `Error: ${error.message}`; // Handle errors
     }
 }
+
+
+
+
+
+async function createUDF() {
+    const udfInput = document.getElementById('udf-details').value;
+    const responseDiv = document.getElementById('udf-response-message');
+
+    try {
+        // Parse the JSON input
+        const requestBody = JSON.parse(udfInput);
+
+        // Make the API call
+        const response = await fetch('http://localhost:8000/create-udf/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        responseDiv.textContent = `Success: ${data.message}`; // Display success message
+    } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`; // Handle errors
+    }
+}
+
+
+
+async function listUDFs() {
+    const responseDiv = document.getElementById('udf-list');
+    responseDiv.innerHTML = ''; // Clear previous results
+
+    try {
+        const response = await fetch('http://localhost:8000/list-udfs/');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        data.forEach(udf => {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            const definitionCell = document.createElement('td');
+
+            nameCell.textContent = udf.name;
+            definitionCell.textContent = udf.definition;
+
+            // Add styling for table cells
+            nameCell.style.border = "1px solid #ddd";
+            nameCell.style.padding = "8px";
+            definitionCell.style.border = "1px solid #ddd";
+            definitionCell.style.padding = "8px";
+
+            row.appendChild(nameCell);
+            row.appendChild(definitionCell);
+            responseDiv.appendChild(row);
+        });
+    } catch (error) {
+        responseDiv.innerHTML = `<tr><td colspan="2">Error: ${error.message}</td></tr>`; // Handle errors
+    }
+}
+
+
+
+
+
+
+async function updateUDF() {
+    const udfName = document.getElementById('udf-name-input').value; // Get the UDF name
+    const newDefinition = document.getElementById('udf-definition-input').value; // Get the new UDF definition
+    const responseDiv = document.getElementById('update-response');
+
+    try {
+        const response = await fetch('http://localhost:8000/update-udf/', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: udfName, definition: newDefinition }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        responseDiv.textContent = data.message; // Display success message
+    } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`; // Handle errors
+    }
+}
+
 
 
 

@@ -2,7 +2,7 @@
 import unittest
 import json
 from typing import Dict, Any
-from utils import parse_rule
+from ..utils import parse_rule
 
 class TestRuleParser(unittest.TestCase):
     def assertASTEqual(self, ast_dict: Dict[str, Any], expected_dict: Dict[str, Any]):

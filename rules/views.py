@@ -179,50 +179,23 @@ def list_udfs(request):
 
 # Update an existing UDF
 @api_view(['PUT'])
-def update_udf(request, udf_id):
+def update_udf(request):
     try:
-        udf = UserDefinedFunction.objects.get(id=udf_id)
-        udf.name = request.data.get('name', udf.name)
-        udf.definition = request.data.get('definition', udf.definition)
+        name = request.data.get('name')
+        definition = request.data.get('definition')
+
+        # Check if the UDF exists
+        udf = UserDefinedFunction.objects.get(name=name)
+
+        # Update the UDF definition
+        udf.definition = definition
         udf.save()
+        
         return Response({'message': 'UDF updated successfully'}, status=status.HTTP_200_OK)
     except UserDefinedFunction.DoesNotExist:
         return Response({'error': 'UDF not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-# Delete a UDF
-@api_view(['DELETE'])
-def delete_udf(request, udf_id):
-    try:
-        udf = UserDefinedFunction.objects.get(id=udf_id)
-        udf.delete()
-        return Response({'message': 'UDF deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    except UserDefinedFunction.DoesNotExist:
-        return Response({'error': 'UDF not found'}, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
-
-@api_view(['POST'])
-def evaluate_udf_api(request):
-    udf_name = request.data.get('udf_name')
-    args = request.data.get('args', [])
-
-    if not udf_name:
-        return Response({'error': 'udf_name is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        udf = UserDefinedFunction.objects.get(name=udf_name)
-        # Use eval or a safer alternative to execute the function based on the definition
-        result = eval(udf.definition)(*args)  # Ensure proper context and sanitization
-        return Response({'result': result}, status=status.HTTP_200_OK)
-    except UserDefinedFunction.DoesNotExist:
-        return Response({'error': 'UDF not found'}, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({'error': f'Error evaluating UDF: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-
 
 
 @api_view(['GET'])

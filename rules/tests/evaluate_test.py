@@ -1,5 +1,5 @@
 import unittest
-from utils import evaluate_rule_ast
+from ..utils import evaluate_rule_ast
 
 class TestEvaluateRuleAST(unittest.TestCase):
     # Test case for a non-existent field
