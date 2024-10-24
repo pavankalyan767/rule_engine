@@ -110,10 +110,11 @@ WSGI_APPLICATION = 'rule_engine.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.sqlite3',  # Or the database you're using
+        'NAME': BASE_DIR / 'db.sqlite3',         # Database name or path
     }
 }
+
 
 
 # Password validation
