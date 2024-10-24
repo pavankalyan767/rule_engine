@@ -11,7 +11,10 @@ from .serializers import ModifyRuleSerializer
 from .utils import parse_rule  # Import your parsing function
 import logging
 import json
+from django.shortcuts import render
 
+def rule_management(request):
+    return render(request, 'rule_engine/templates/index.html')
 
 
 
@@ -41,39 +44,42 @@ def create_rule(request):
 @api_view(['POST'])
 def combine_rules(request):
     """
-    API endpoint to combine rules into a single AST.
-    Expects a JSON body with a list of rule strings.
+    API endpoint to combine rules using their IDs into a single AST.
+    Expects a JSON body with a list of rule IDs.
     """
-    rules = request.data.get('rules', [])
-    
+    rule_ids = request.data.get('rule_ids', [])
+
     # Validate the input
-    if not isinstance(rules, list):
+    if not isinstance(rule_ids, list):
         return Response(
-            {'error': 'Invalid input. Please provide a list of rule strings.'},
+            {'error': 'Invalid input. Please provide a list of rule IDs.'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Filter out invalid rules (non-string or empty)
-    valid_rules = [rule for rule in rules if isinstance(rule, str) and rule.strip()]
+    # Retrieve rules from the database
+    rules = Rule.objects.filter(id__in=rule_ids)
+
+    # Filter out any invalid or non-existing rules
+    valid_rules = [rule.rule_string for rule in rules]
 
     if not valid_rules:
         return Response(
-            {'error': 'No valid rules provided to combine.'},
+            {'error': 'No valid rules found for the provided IDs.'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Combine valid rules
+    # Combine valid rules into an AST (you need to implement this logic)
     combined_ast = combine_rules_ast(valid_rules)
-    
+
     if combined_ast is None:
         return Response(
-            {'error': 'No valid rules provided to combine.'},
+            {'error': 'Failed to combine rules into an AST.'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
     # Convert the combined AST to a string representation
-    combined_rule_string = "COMBINED_RULE_STRING"  # You might want to implement a logic to generate this.
-    
+    combined_rule_string = "COMBINED_RULE_STRING"  # Replace with actual logic to generate this
+
     # Save the combined rule to the database
     combined_rule = Rule.objects.create(rule_string=combined_rule_string)
 
@@ -215,3 +221,11 @@ def evaluate_udf_api(request):
         return Response({'error': 'UDF not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': f'Error evaluating UDF: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+
+
+@api_view(['GET'])
+def list_rules(request):
+    rules = Rule.objects.all()
+    return Response([{"rule_string": rule.rule_string} for rule in rules])

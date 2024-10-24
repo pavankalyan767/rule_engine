@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create and Combine Rules</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 10px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create and Combine Rules</h1>
+
+    <!-- Create Rule Section -->
+    <div class="container" id="create-rule-container">
+        <h2>Create Rule</h2>
+        <label for="rule-string">Enter Rule String (JSON format):</label><br>
+        <textarea id="rule-string" rows="4" placeholder='{"rule_string": "age > 21 AND (income >= 40000 OR spend < 200)"}'></textarea><br>
+        <button onclick="createRule()">Create Rule</button>
+        <h3>Response:</h3>
+        <div class="response" id="create-response"></div>
+    </div>
+
+    <!-- Combine Rules Section -->
+    <div class="container" id="combine-rules-container">
+        <h2>Combine Rules</h2>
+        <label for="rule-ids">Enter Rule IDs to Combine (JSON format):</label><br>
+        <textarea id="rule-ids" rows="4" placeholder='{"rule_ids": [1, 2, 3]}'></textarea><br>
+        <button onclick="combineRules()">Combine Rules</button>
+        <h3>Combined Rule Response:</h3>
+        <div class="response" id="combine-response"></div>
+    </div>
+    <div class="container" id="evaluate-rule-container">
+        <h2>Evaluate Rule</h2>
+        
+        <h3>User Data and Rule String</h3>
+        <label for="evaluate-input">Input (JSON):</label>
+        <textarea id="evaluate-input" rows="6" 
+                  placeholder='{"user_data": {"age": 22, "income": 70000, "department": "Engineering", "spend": 500}, "rule_string": "(department == '\''Engineering'\'' AND spend < 600) OR (age >= 20 AND income >= 50000)"}' 
+                  style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px;"></textarea>
+    
+        <button onclick="evaluateRule()">Evaluate Rule</button>
+    
+        <h3>Evaluation Response:</h3>
+        <div class="response" id="evaluate-response"></div>
+    </div>
+    
+
+
+
+    <div class="container" id="modify-rule-container">
+        <h2>Modify Rule</h2>
+        <label for="modify-rule-input">Rule Modification (JSON):</label>
+        <textarea id="modify-rule-input" rows="4" placeholder='{"rule_id": 35, "new_rule_string": "(age > 30 AND income >= 60000) OR (department == 'Engineering' AND spend < 800)"}' style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px;"></textarea>
+        
+        <button onclick="modifyRule()">Modify Rule</button>
+        <h3>Modification Response:</h3>
+        <div class="response" id="modify-response"></div>
+    </div>
+    
+    
+
+    
+    
+    
+    
+
+    <script>
+        async function createRule() {
+            const ruleString = document.getElementById('rule-string').value;
+            const responseDiv = document.getElementById('create-response');
+
+            try {
+                const response = await fetch('http://localhost:8000/create-rule/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: ruleString,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function combineRules() {
+    const ruleIds = document.getElementById('rule-ids').value.trim();
+    const responseDiv = document.getElementById('combine-response');
+
+    try {
+        // Check if the input is empty
+        if (!ruleIds) {
+            responseDiv.textContent = "Error: Input cannot be empty.";
+            return;
+        }
+
+        // Attempt to parse the input to ensure it's valid JSON
+        let parsedInput;
+        try {
+            parsedInput = JSON.parse(ruleIds);
+        } catch (error) {
+            responseDiv.textContent = "Error: Invalid JSON format. Please enter valid JSON.";
+            return;
+        }
+
+        // Ensure the parsed input is an object and contains rule_ids
+        if (typeof parsedInput !== 'object' || !Array.isArray(parsedInput.rule_ids)) {
+            responseDiv.textContent = "Error: JSON must be in the format {'rule_ids': [id1, id2, ...]}";
+            return;
+        }
+
+        const jsonBody = JSON.stringify(parsedInput); // Use the validated input
+
+        const response = await fetch('http://localhost:8000/combine-rules/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonBody,
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(`HTTP error! Status: ${response.status} - ${errorResponse.detail || 'Unknown error'}`);
+        }
+
+        const data = await response.json();
+        responseDiv.textContent = JSON.stringify(data, null, 2); // Handle the output similarly
+    } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`;
+    }
+}
+async function evaluateRule() {
+    const input = document.getElementById('evaluate-input').value;
+    const responseDiv = document.getElementById('evaluate-response');
+
+    try {
+        // Parse the input JSON directly
+        const requestBody = JSON.parse(input);
+
+        // Make the API call
+        const response = await fetch('http://localhost:8000/evaluate-rule/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        responseDiv.textContent = JSON.stringify(data, null, 2); // Display the response
+    } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`; // Handle errors
+    }
+}
+
+
+
+async function modifyRule() {
+    const modifyInput = document.getElementById('modify-rule-input').value;
+    const responseDiv = document.getElementById('modify-response');
+
+    try {
+        // Parse the JSON input
+        const requestBody = JSON.parse(modifyInput);
+
+        // Make the API call
+        const response = await fetch('http://localhost:8000/modify-rule/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        responseDiv.textContent = data.message; // Display success message
+    } catch (error) {
+        responseDiv.textContent = `Error: ${error.message}`; // Handle errors
+    }
+}
+
+
+
+
+
+    </script>
+</body>
+</html>
