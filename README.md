@@ -174,7 +174,7 @@ Uses the most frequent operator heuristic to determine which operator to use for
 #### Request Format
 ```json
 {
-    "rule_ids": [1, 2, 3],
+    "rule_ids": [1, 2, 3]
     
 }
 ```
@@ -297,10 +297,11 @@ Modify an existing UDF.
 - **Content-Type**: `application/json`
 
 ##### Request Format
+Enter name in the first section ex: my_udf without quotes
 ```json
 {
-    "name": "my_udf",
-    "definition": "return x + 20;",
+    
+    "definition": "return x + 20;"
 }
 ```
 
@@ -312,6 +313,16 @@ Modify an existing UDF.
     
 }
 ```
+
+
+#### 5 Modify Rule
+```json
+{"rule_id":1,"new_rule_string":"department=Sales"}
+```
+#### Result
+##### Updated Sucessfully
+
+
 
 ## Error Handling
 All APIs return appropriate HTTP status codes and error messages:
