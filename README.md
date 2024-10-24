@@ -15,52 +15,61 @@ This document outlines the API endpoints for the Rule Engine application. Each e
   {
       "rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
   }
+### Create Rule Response
+
+When you create a rule, the response will be:
+
+```json
 {
-    "parsed_rule": {
-        "operator": "OR",
+  "parsed_rule": {
+    "operator": "OR",
+    "left": {
+      "operator": "AND",
+      "left": {
+        "operator": ">",
         "left": {
-            "operator": "AND",
-            "left": {
-                "operator": ">",
-                "left": {
-                    "name": "age"
-                },
-                "right": {
-                    "value": 18
-                }
-            },
-            "right": {
-                "operator": ">=",
-                "left": {
-                    "name": "income"
-                },
-                "right": {
-                    "value": 50000
-                }
-            }
+          "name": "age"
         },
         "right": {
-            "operator": "AND",
-            "left": {
-                "operator": "==",
-                "left": {
-                    "name": "department"
-                },
-                "right": {
-                    "name": "IT"
-                }
-            },
-            "right": {
-                "operator": "<",
-                "left": {
-                    "name": "spend"
-                },
-                "right": {
-                    "value": 1000
-                }
-            }
+          "value": 18
         }
+      },
+      "right": {
+        "operator": ">=",
+        "left": {
+          "name": "income"
+        },
+        "right": {
+          "value": 50000
+        }
+      }
     },
+    "right": {
+      "operator": "AND",
+      "left": {
+        "operator": "==",
+        "left": {
+          "name": "department"
+        },
+        "right": {
+          "name": "IT"
+        }
+      },
+      "right": {
+        "operator": "<",
+        "left": {
+          "name": "spend"
+        },
+        "right": {
+          "value": 1000
+        }
+      }
+    }
+  },
+  "saved_rule_id": 35,
+  "saved_rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
+}
+
     "saved_rule_id": 35,
     "saved_rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
 }
