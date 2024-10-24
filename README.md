@@ -13,7 +13,7 @@ cd rule_engine
 - Python 3.8 or higher
 - Django 4.0 or higher
 - pip (Python package manager)
-- PostgreSQL (recommended) or SQLite
+
 
 ## Installation & Setup
 
@@ -30,6 +30,7 @@ source venv/bin/activate
 
 2. Install dependencies:
 ```bash
+cd rule_engine
 pip install -r requirements.txt
 ```
 
