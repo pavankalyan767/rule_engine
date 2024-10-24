@@ -33,19 +33,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Configure database in `settings.py`:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rule_engine_db',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+
 
 4. Run migrations:
 ```bash
