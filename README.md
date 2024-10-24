@@ -102,8 +102,8 @@ Create and parse business rules into a tree structure.
 #### Request Format
 ```json
 {
-    "rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)",
-    "description": "Premium customer eligibility rule"
+    "rule_string": "(age > 18 AND income >= 50000) OR (department == \"IT\" AND spend < 1000)"
+
 }
 ```
 
@@ -269,7 +269,7 @@ Create a new user-defined function.
 ```json
     {
     "name": "discount_eligibility",
-    "code": "def discount_eligibility(age, spend):\n    return age > 25 and spend > 1000"
+    "definition": "def discount_eligibility(age, spend):\n    return age > 25 and spend > 1000"
 }
 ```
 
@@ -285,7 +285,7 @@ Get all available UDFs.
 ```json
 {
     "name": "discount_eligibility",
-    "code": "def discount_eligibility(age, spend):\n    return age > 25 and spend > 1000"
+    "definition": "def discount_eligibility(age, spend):\n    return age > 25 and spend > 1000"
 }
 ```
 
